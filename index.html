@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Galactic Gaming Station</title>
+
+<style>
+body {
+  background: radial-gradient(circle at top, #0f172a, #020617);
+  color: white;
+  font-family: 'Segoe UI';
+  margin:0;
+}
+
+/* 🌌 BACKGROUND */
+body::before {
+  content:"";
+  position:fixed;
+  width:200%;
+  height:200%;
+  background:url("https://www.transparenttextures.com/patterns/stardust.png");
+  opacity:0.90;
+  animation: moveStars 60s linear infinite;
+  z-index:-1;
+}
+
+@keyframes moveStars {
+  from {
+    transform: translate(0,0);
+  }
+  to {
+    transform: translate(-500px, -500px);
+  }
+}
+h2 {
+  text-shadow: 0 0 10px rgba(168,85,247,0.6);
+}
+/* HEADER */
+h1 {
+  color:#a855f7;
+  text-shadow:0 0 20px #a855f7;
+}
+
+/* LAYOUT */
+.container {
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:20px;
+}
+
+/* 📱 MOBILE MODE */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns:1fr;
+  }
+
+  .cart-box {
+    position:relative;
+    top:0;
+    margin-top:20px;
+  }
+}
+
+/* CARD */
+.card {
+  background:#0f172a;
+  padding:15px;
+  border-radius:15px;
+  margin:10px 0;
+  box-shadow:0 0 15px rgba(168,85,247,0.3);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+
+  transition: all 0.3s ease;
+}
+
+/* 🔥 HOVER EFFECT */
+.card:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow:
+    0 0 10px #a855f7,
+    0 0 30px #7c3aed,
+    0 0 60px rgba(168,85,247,0.6);
+}
+
+.habis { opacity:0.4; }
+
+/* BUTTON */
+button {
+  background:#7c3aed;
+  color:white;
+  border:none;
+  padding:5px 10px;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+button:disabled {
+  background:gray;
+}
+
+/* KERANJANG STICKY */
+.cart-box {
+  background:#0f172a;
+  padding:15px;
+  border-radius:15px;
+  position:sticky;
+  top:20px;
+  height:fit-content;
+  box-shadow:0 0 15px rgba(168,85,247,0.3);
+}
+
+/* IMAGE */
+img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+/* QRIS MODAL */
+#qrisModal {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+  z-index: 9999;
+}
+
+.modal-box {
+  background:#0f172a;
+  padding:20px;
+  border-radius:15px;
+  text-align:center;
+  position:relative;
+}
+
+.close-btn {
+  position:absolute;
+  top:10px;
+  right:10px;
+  cursor:pointer;
+  font-size:18px;
+}
+
+/* 📱 MOBILE APP STYLE */
+@media (max-width:768px){
+
+  .grid {
+    grid-template-columns:1fr;
+  }
+
+  .cart-box {
+    display:none; /* sembunyikan cart lama */
+  }
+
+  /* FLOATING BUTTON */
+  .floating-cart {
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#7c3aed;
+    color:white;
+    padding:15px;
+    border-radius:50%;
+    font-size:20px;
+    box-shadow:0 0 15px #7c3aed;
+    cursor:pointer;
+    z-index:999;
+  }
+
+  /* POPUP CART */
+  .cart-popup {
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    height:70%;
+    background:#0f172a;
+    border-radius:20px 20px 0 0;
+    padding:20px;
+    display:none;
+    flex-direction:column;
+    z-index:1000;
+  }
+
+  .cart-popup.active {
+    display:flex;
+  }
+
+  .close-cart {
+  text-align: right;
+  font-size: 12px;
+  padding-right: 30px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+  
+  .grid { grid-template-columns:1fr; }
+
+  .cart-box { display:none; }
+
+  body { font-size:14px; }
+  h1 { font-size:20px; }
+  h2 { font-size:16px; }
+
+  .card {
+    font-size:13px;
+    padding:12px;
+  }
+
+  button {
+    font-size:13px;
+  }
+
+  .floating-cart {
+    position:fixed;
+    bottom:20px;
+    right:20px;
+  }
+
+}
+  
+  /* FLOATING TOTAL BAR */
+#totalBar {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: #22c55e;
+  padding: 12px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(34,197,94,0.5);
+  cursor: pointer;
+  z-index: 9999;
+}
+
+/* DETAIL POPUP */
+#totalDetail {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60%;
+  background: #0f172a;
+  border-radius: 20px 20px 0 0;
+  padding: 20px;
+  display: none;
+  z-index: 9999;
+  transform: translateY(100%);
+  transition: 0.3s;
+}
+
+#totalDetail.active {
+  display: block;
+  transform: translateY(0);
+}
+
+#cartCount {
+  position:absolute;
+  top:-5px;
+  right:-5px;
+  background:red;
+  color:white;
+  font-size:12px;
+  padding:3px 6px;
+  border-radius:50%;
+}
+body::after {
+  content:"";
+  position:fixed;
+  width:100%;
+  height:100%;
+  background: radial-gradient(white 1px, transparent 1px);
+  background-size:20px 20px;
+  opacity:0.1;
+  animation: sparkle 4s infinite alternate;
+  z-index:-1;
+}
+
+@keyframes sparkle {
+  from { opacity:0.05; }
+  to { opacity:0.2; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚀 Galactic Gaming Station</h1>
+<p>✨ Pesanan diproses setelah pembayaran</p>
+
+<input id="nama" placeholder="👤 Nama kamu(wajib diisi)"><br><br>
+
+<div class="grid">
+
+<!-- MENU -->
+<div id="menu"></div>
+
+<!-- KERANJANG -->
+<div class="cart-box">
+<h2>🛒 Keranjang</h2>
+<div id="cart"></div>
+<h3>Total: Rp <span id="total">0</span></h3>
+
+<select id="metode">
+<option>QRIS</option>
+<option>Cash</option>
+</select>
+
+<br><br>
+<button onclick="prosesPesan()">🚀 Pesan Sekarang</button>
+</div>
+
+</div>
+</div>
+
+<!-- QRIS -->
+<div id="qrisModal">
+  <div class="modal-box">
+    <div class="close-btn" onclick="tutupQR()">❌</div>
+    <h2>Scan QRIS</h2>
+    <p style="font-size:12px; line-height:1.2;">
+1. Scan QRIS di bawah ini<br>
+2. Lakukan pembayaran<br>
+3. Screenshot bukti pembayaran<br>
+4. Klik tombol "Sudah Bayar"<br><br>
+📸 Bukti screenshot WAJIB dikirim ya 🙏
+</p>
+    <img src="https://lh3.googleusercontent.com/d/1MEgJ4cTeEfzZQkUCnmD2uU-_8LAQP-ut" style="width:180px; max-width:80%;"><br><br>
+    <button onclick="kirimWA()">✅ Sudah Bayar</button>
+  </div>
+</div>
+
+<script>
+function toggleTotalBar(){
+  let el = document.getElementById("totalDetail");
+  el.classList.toggle("active");
+
+  let arrow = document.getElementById("arrow");
+  arrow.innerText = el.classList.contains("active") ? "⬇️" : "⬆️";
+}
+let menu=[];
+let cart={};
+
+const sheetURL = "https://opensheet.elk.sh/1hyHQBSxngDlz9A9f19gDsGS4UZsZJWB0b_Vc2_FOsPw/MENU";
+
+fetch(sheetURL)
+.then(res=>res.json())
+.then(data=>{
+  menu=data.map((item,i)=>({
+    nama:item.Nama,
+    harga:Number(item.Harga),
+    kategori:(item.Kategori||"").toLowerCase(),
+    varian:item.Varian,
+    status:item.Status,
+    gambar:item.Gambar,
+    id:i
+  }));
+  render();
+});
+
+function render(){
+  let html="";
+  let group={};
+
+  const icon={
+    "makanan":"🍜",
+    "snack":"🍟",
+    "minuman":"🥤"
+  };
+
+  menu.forEach(m=>{
+    if(!group[m.kategori]) group[m.kategori]=[];
+    group[m.kategori].push(m);
+  });
+
+  for(let k in group){
+    html+=`<h2>${icon[k]||"✨"} ${k.toUpperCase()}</h2>`;
+
+    group[k].forEach(m=>{
+      html+=`
+      <div class="card ${m.status=='habis'?'habis':''}">
+
+        <div style="flex:1;">
+          ${m.nama} - Rp ${m.harga}<br>
+
+          ${m.varian && m.varian!='-' ? `
+          <select id="var${m.id}">
+          ${m.varian.split(",").map(v=>`<option>${v}</option>`).join("")}
+          </select>`:''}
+
+          <br>
+          <button onclick="kurang(${m.id})">➖</button>
+          <span id="q${m.id}">0</span>
+          <button onclick="tambah(${m.id})">➕</button>
+        </div>
+
+        <div style="width:110px;height:110px;">
+          ${m.gambar?`<img src="${m.gambar}">`:''}
+        </div>
+
+      </div>`;
+    });
+  }
+
+  document.getElementById("menu").innerHTML=html;
+}
+
+function getKey(i){
+  let v=document.getElementById("var"+i)?.value||"";
+  return i+"-"+v;
+}
+
+function tambah(i){
+  let key=getKey(i);
+  cart[key]=(cart[key]||0)+1;
+
+  let el = document.getElementById("q"+i);
+  el.innerText = cart[key];
+
+  el.style.transform = "scale(1.5)";
+  setTimeout(()=> el.style.transform="scale(1)",200);
+
+  update();
+}
+
+function kurang(i){
+  let key=getKey(i);
+  if(cart[key]>0){
+    cart[key]--;
+    document.getElementById("q"+i).innerText=cart[key];
+  }
+  update();
+}
+
+function update(){
+  let html="";
+  let total=0;
+
+  for(let key in cart){
+    if(cart[key]>0){
+      let [i,varian]=key.split("-");
+      let m=menu[i];
+      total+=m.harga*cart[key];
+
+      html+=`🧾 ${m.nama} ${varian?`(${varian})`:''} x${cart[key]}<br>`;
+    }
+  }
+
+  // DESKTOP
+  document.getElementById("cart").innerHTML=html;
+  document.getElementById("total").innerText=total;
+
+  // MOBILE CART
+  document.getElementById("cartMobile").innerHTML=html;
+  document.getElementById("totalMobile").innerText=total;
+
+  // FLOATING BAR
+  document.getElementById("totalMini").innerText = total;
+  document.getElementById("detailIsi").innerHTML = html;
+  let count=0;
+for(let key in cart){
+  count += cart[key];
+}
+document.getElementById("cartCount").innerText = count;
+}
+
+function prosesPesan(){
+  let nama=document.getElementById("nama").value;
+
+  if(!nama){
+    alert("⚠️ Nama wajib diisi dulu ya!");
+    return;
+  }
+
+  let metode=document.getElementById("metode").value;
+
+  if(metode=="QRIS"){
+    document.getElementById("qrisModal").style.display="flex";
+  } else {
+    kirimWA();
+  }
+}
+
+function tutupQR(){
+  document.getElementById("qrisModal").style.display="none";
+}
+
+function kirimWA(){
+  let nama=document.getElementById("nama").value;
+  let metode = document.getElementById("metodeMobile")?.value 
+           || document.getElementById("metode").value;
+
+  let pesan="🚀 ORDER GALACTIC%0A";
+  pesan+="📸 Kirim bukti transfer ya kak 🙏%0A%0A";
+  pesan+="👤 "+nama+"%0A%0A";
+
+  for(let key in cart){
+    if(cart[key]>0){
+      let [i,varian]=key.split("-");
+      let m=menu[i];
+      pesan+=m.nama+(varian?` (${varian})`:'')+" x"+cart[key]+"%0A";
+    }
+  }
+
+  pesan+="%0A💰 "+metode;
+
+  window.open("https://wa.me/6285788886957?text="+pesan);
+}
+
+function toggleCart(){
+  document.getElementById("cartPopup").classList.toggle("active");
+}
+
+function prosesPesanMobile(){
+  let nama=document.getElementById("nama").value;
+  if(!nama){
+    alert("⚠️ Namanya diisi dulu yaa kak🫡");
+    return;
+  }
+
+  // 🔥 TUTUP CART DULU
+  document.getElementById("cartPopup").classList.remove("active");
+
+  let metode=document.getElementById("metodeMobile").value;
+
+  if(metode=="QRIS"){
+    document.getElementById("qrisModal").style.display="flex";
+  } else {
+    kirimWA();
+  }
+}
+</script>
+<!-- FLOATING CART -->
+<div class="floating-cart" onclick="toggleCart()">
+🛒 <span id="cartCount">0</span>
+</div>
+
+<!-- CART POPUP -->
+<div id="cartPopup" class="cart-popup">
+
+<div class="close-cart" onclick="toggleCart()">❌</div>
+
+<h2>🛒 Keranjang</h2>
+<div id="cartMobile"></div>
+<h3>Total: Rp <span id="totalMobile">0</span></h3>
+
+<select id="metodeMobile">
+<option>QRIS</option>
+<option>Cash</option>
+</select>
+
+<br>
+<button onclick="prosesPesanMobile()">🚀 Pesan</button>
+
+</div>
+<!-- FLOATING TOTAL BAR -->
+<div id="totalBar" onclick="toggleTotalBar()">
+  💰 Rp <span id="totalMini">0</span> <span id="arrow">⬆️</span>
+</div>
+
+<!-- EXPAND DETAIL -->
+<div id="totalDetail" class="total-detail">
+  <div onclick="toggleTotalBar()" style="text-align:right;cursor:pointer;">❌</div>
+  <h3>Detail Pesanan</h3>
+  <div id="detailIsi"></div>
+
+</body>
+</html>
