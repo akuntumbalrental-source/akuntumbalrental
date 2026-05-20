@@ -310,6 +310,22 @@ body::after {
   box-shadow:0 0 10px #7c3aed;
 }
 
+.fade-out {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.2s;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: 0.3s;
+}
+
+.tab-btn {
+  transition: all 0.3s ease;
+}
+
 </style>
 </head>
 
@@ -326,9 +342,9 @@ body::after {
 
 <!-- MENU -->
 <div class="menu-tabs">
-  <button class="tab-btn active" onclick="filterMenu('makanan')">🍜 Makanan</button>
-  <button class="tab-btn" onclick="filterMenu('snack')">🍟 Snack</button>
-  <button class="tab-btn" onclick="filterMenu('minuman')">🥤 Minuman</button>
+  <button class="tab-btn active" onclick="filterMenu('makanan', this)">🍜 Makanan</button>
+  <button class="tab-btn" onclick="filterMenu('snack', this)">🍟 Snack</button>
+  <button class="tab-btn" onclick="filterMenu('minuman', this)">🥤 Minuman</button>
 </div>
 <div id="menu"></div>
 
@@ -421,17 +437,35 @@ function render(){
   document.getElementById("menu").innerHTML=html;
 }
 
-function filterMenu(kategori){
+function filterMenu(kategori, el){
   currentKategori = kategori;
 
-  // update active button
-  document.querySelectorAll(".tab-btn").forEach(btn=>{
-    btn.classList.remove("active");
-  });
+  let menuEl = document.getElementById("menu");
 
-  event.target.classList.add("active");
+  // animasi keluar
+  menuEl.classList.add("fade-out");
 
-  render();
+  setTimeout(()=>{
+    // 🔥 RESET SEMUA TAB (lebih aman)
+    let tabs = document.getElementsByClassName("tab-btn");
+    for(let i=0;i<tabs.length;i++){
+      tabs[i].classList.remove("active");
+    }
+
+    // 🔥 AKTIFKAN YANG DIKLIK
+    el.classList.add("active");
+
+    render();
+
+    // animasi masuk
+    menuEl.classList.remove("fade-out");
+    menuEl.classList.add("fade-in");
+
+    setTimeout(()=>{
+      menuEl.classList.remove("fade-in");
+    },300);
+
+  },200);
 }
 
 function getKey(i){
@@ -525,15 +559,21 @@ function kirimWA(){
   pesan+="📸 Kirim bukti transfer ya kak 🙏%0A%0A";
   pesan+="👤Nama: "+nama+"%0A%0A";
 
+  let total=0;
+
   for(let key in cart){
     if(cart[key]>0){
       let [i,varian]=key.split("-");
       let m=menu[i];
-      pesan+=m.nama+(varian?` (${varian})`:'')+" x"+cart[key]+"%0A";
+      let subtotal = m.harga * cart[key];
+      total += subtotal;
+
+      pesan+=`${m.nama}${varian?` (${varian})`:''} x${cart[key]} = Rp ${formatRupiah(subtotal)}%0A`;
     }
   }
 
-  pesan+="%0A💰 "+metode;
+  pesan+=`%0A🧾 Total: Rp ${formatRupiah(total)}%0A`;
+  pesan+=`💰 Metode: ${metode}`;
 
   window.open("https://wa.me/6285788886957?text="+pesan);
 }
