@@ -168,22 +168,19 @@ img {
 
   /* POPUP CART */
   .cart-popup {
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:70%;
-    background:#0f172a;
-    border-radius:20px 20px 0 0;
-    padding:15px;
-    display:none;
-    flex-direction:column;
-    z-index:1000;
-    overflow-y: auto;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    transform: translateY(100%);
-    transition: 0.3s;
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:75%;
+  background:#0f172a;
+  border-radius:20px 20px 0 0;
+  display:flex;
+  flex-direction:column;
+  z-index:1000;
+  overflow:hidden; /* 🔥 penting biar ga bocor */
+  transform: translateY(100%);
+  transition: 0.3s;
   }
 
   .cart-popup.active {
@@ -225,7 +222,7 @@ img {
   color:white;
   padding:12px 18px;
   border-radius:30px;
-  font-size:14px;
+  font-size:12px;
   box-shadow:0 0 15px #7c3aed;
   cursor:pointer;
   z-index:999;
@@ -324,6 +321,18 @@ body::after {
 
 .tab-btn {
   transition: all 0.3s ease;
+}
+
+table tr:nth-child(even) {
+  background: rgba(255,255,255,0.03);
+}
+
+table th {
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+table td, table th {
+  padding:6px;
 }
 
 </style>
@@ -498,35 +507,54 @@ function kurang(i){
 }
 
 function update(){
-  let html="";
   let total=0;
+  let no = 1;
+
+  let html = `
+  <table style="width:100%; font-size:13px; border-collapse:collapse;">
+    <tr style="text-align:left; opacity:0.7;">
+      <th style="width:30px;">No</th>
+      <th>Item</th>
+      <th style="text-align:center;">Qty</th>
+      <th style="text-align:right;">Harga</th>
+    </tr>
+  `;
 
   for(let key in cart){
     if(cart[key]>0){
       let [i,varian]=key.split("-");
       let m=menu[i];
-      total+=m.harga*cart[key];
+      let subtotal = m.harga * cart[key];
+      total += subtotal;
 
-      html+=`🧾 ${m.nama} ${varian?`(${varian})`:''} x${cart[key]}<br>`;
+      html += `
+      <tr>
+        <td>${no++}</td>
+        <td>${m.nama} ${varian?`(${varian})`:''}</td>
+        <td style="text-align:center;">${cart[key]}</td>
+        <td style="text-align:right;">Rp ${formatRupiah(subtotal)}</td>
+      </tr>
+      `;
     }
   }
 
-  // DESKTOP
-  document.getElementById("cart").innerHTML=html;
+  html += `</table>`;
+
+  // inject ke semua
+  document.getElementById("cart").innerHTML = html;
+  document.getElementById("cartMobile").innerHTML = html;
+
   document.getElementById("total").innerText = formatRupiah(total);
-
-  // MOBILE CART
-  document.getElementById("cartMobile").innerHTML=html;
   document.getElementById("totalMobile").innerText = formatRupiah(total);
-
-  // FLOATING BAR
   document.getElementById("totalMini").innerText = formatRupiah(total);
+
   document.getElementById("detailIsi").innerHTML = html;
+
   let count=0;
-for(let key in cart){
-  count += cart[key];
-}
-document.getElementById("cartCount").innerText = count;
+  for(let key in cart){
+    count += cart[key];
+  }
+  document.getElementById("cartCount").innerText = count;
 }
 
 function prosesPesan(){
