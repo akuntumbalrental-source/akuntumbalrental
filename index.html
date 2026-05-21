@@ -356,6 +356,10 @@ tr {
   border-bottom:1px solid rgba(255,255,255,0.08);
 }
 
+button:hover {
+  box-shadow: 0 0 10px #7c3aed;
+}
+
 </style>
 </head>
 
@@ -413,6 +417,32 @@ tr {
   </div>
 </div>
 
+<!-- MODAL VARIAN -->
+<div id="varianModal" style="
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.7);
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+">
+  <div style="
+    background:#0f172a;
+    padding:20px;
+    border-radius:15px;
+    width:80%;
+    max-width:300px;
+    text-align:center;
+  ">
+    <h3>Pilih Varian</h3>
+    <div id="varianList"></div>
+    <br>
+    <button onclick="tutupVarian()">❌ Batal</button>
+  </div>
+</div>
+
 <script>
 let menu=[];
 let cart={};
@@ -447,11 +477,6 @@ function render(){
         <div style="flex:1;">
           ${m.nama} - Rp ${formatRupiah(m.harga)}<br>
           ${m.status=='habis' ? '<span style="color:red;font-size:12px;">❌ Stok Habis</span><br>' : ''}
-          
-          ${m.varian && m.varian!='-' ? `
-          <select id="var${m.id}">
-          ${m.varian.split(",").map(v=>`<option>${v}</option>`).join("")}
-          </select>`:''}
 
           <br>
           <button onclick="kurang(${m.id})" ${m.status=='habis'?'disabled':''}>➖</button>
@@ -505,25 +530,58 @@ function getKey(i){
 
 function tambah(i){
   let m = menu[i];
-  if(m.status == 'habis') return; // 🔥 block total
+  if(m.status == 'habis') return;
 
-  let key=getKey(i);
-  cart[key]=(cart[key]||0)+1;
+  // 🔥 kalau ada varian → buka popup
+  if(m.varian && m.varian != "-"){
+    bukaVarian(i);
+    return;
+  }
 
-  let el = document.getElementById("q"+i);
-  el.innerText = cart[key];
-  el.style.transform = "scale(1.5)";
-  setTimeout(()=> el.style.transform="scale(1)",200);
+  // 🔥 tanpa varian → langsung tambah
+  let key = i + "-";
+  cart[key] = (cart[key] || 0) + 1;
+
+  let totalQty = 0;
+  for(let k in cart){
+    let [id] = k.split("-");
+    if(Number(id) === i){
+      totalQty += cart[k];
+    }
+  }
+
+  document.getElementById("q"+i).innerText = totalQty;
 
   update();
 }
 
 function kurang(i){
-  let key=getKey(i);
-  if(cart[key]>0){
-    cart[key]--;
-    document.getElementById("q"+i).innerText=cart[key];
+  let m = menu[i];
+
+  let varian = "";
+
+  if(m.varian && m.varian != "-"){
+    varian = prompt("Kurangi varian mana?\n" + m.varian.split(",").join("\n"));
+    if(!varian) return;
   }
+
+  let key = i + "-" + varian;
+
+  if(cart[key] > 0){
+    cart[key]--;
+  }
+
+  // hitung ulang total
+  let totalQty = 0;
+  for(let k in cart){
+    let [id] = k.split("-");
+    if(Number(id) === i){
+      totalQty += cart[k];
+    }
+  }
+
+  document.getElementById("q"+i).innerText = totalQty;
+
   update();
 }
 
@@ -568,8 +626,6 @@ function update(){
   document.getElementById("total").innerText = formatRupiah(total);
   document.getElementById("totalMobile").innerText = formatRupiah(total);
   document.getElementById("totalMini").innerText = formatRupiah(total);
-
-  document.getElementById("detailIsi").innerHTML = html;
 
   let count=0;
   for(let key in cart){
@@ -653,6 +709,52 @@ function prosesPesanMobile(){
 function formatRupiah(angka){
   return angka.toLocaleString("id-ID");
 }
+
+let selectedMenu = null;
+
+function bukaVarian(i){
+  selectedMenu = i;
+  let m = menu[i];
+
+  let list = m.varian.split(",");
+  let html = "";
+
+  list.forEach(v=>{
+    html += `<button onclick="pilihVarian('${v}')"
+      style="display:block;width:100%;margin:5px 0;">
+      ${v}
+    </button>`;
+  });
+
+  document.getElementById("varianList").innerHTML = html;
+  document.getElementById("varianModal").style.display = "flex";
+}
+
+function tutupVarian(){
+  document.getElementById("varianModal").style.display = "none";
+}
+
+function pilihVarian(v){
+  let i = selectedMenu;
+  let key = i + "-" + v;
+
+  cart[key] = (cart[key] || 0) + 1;
+
+  // update qty total per menu
+  let totalQty = 0;
+  for(let k in cart){
+    let [id] = k.split("-");
+    if(Number(id) === i){
+      totalQty += cart[k];
+    }
+  }
+
+  document.getElementById("q"+i).innerText = totalQty;
+
+  tutupVarian();
+  update();
+}
+
 </script>
 <!-- FLOATING CART -->
 <div class="floating-cart" onclick="toggleCart()">
