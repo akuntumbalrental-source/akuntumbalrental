@@ -610,8 +610,18 @@ function update(){
       <tr>
         <td>${no++}</td>
         <td>${m.nama} ${varian?`(${varian})`:''}</td>
-        <td style="text-align:center;">${cart[key]}</td>
-        <td style="text-align:right;">Rp ${formatRupiah(subtotal)}</td>
+        <td style="text-align:center;">
+  		  <button onclick="kurangCart('${key}')">➖</button>
+	      ${cart[key]}
+  	      <button onclick="tambahCart('${key}')">➕</button>
+		</td>
+        <td style="text-align:right;">
+  		  Rp ${formatRupiah(subtotal)}
+  		  <br>
+ 		  <button onclick="hapusItem('${key}')" style="font-size:10px;margin-top:5px;">
+   		    ❌ hapus
+		  </button>
+		</td>
       </tr>
       `;
     }
@@ -752,6 +762,23 @@ function pilihVarian(v){
   document.getElementById("q"+i).innerText = totalQty;
 
   tutupVarian();
+  update();
+}
+
+function tambahCart(key){
+  cart[key] = (cart[key] || 0) + 1;
+  update();
+}
+
+function kurangCart(key){
+  if(cart[key] > 0){
+    cart[key]--;
+  }
+  update();
+}
+
+function hapusItem(key){
+  delete cart[key];
   update();
 }
 
