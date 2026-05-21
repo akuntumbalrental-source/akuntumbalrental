@@ -304,11 +304,12 @@ body::after {
   color:white;
   cursor:pointer;
   font-weight:bold;
+  transition: all 0.3s ease;
 }
 
 .tab-btn.active {
-  background:#7c3aed;
-  box-shadow:0 0 10px #7c3aed;
+  background:#22c55e;
+  box-shadow:0 0 15px rgba(34,197,94,0.6);
 }
 
 .fade-out {
@@ -358,6 +359,62 @@ tr {
 
 button:hover {
   box-shadow: 0 0 10px #7c3aed;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+/* warna beda biar jelas */
+.btn-icon.plus {
+  color: #22c55e; /* hijau */
+}
+
+.btn-icon.minus {
+  color: #f59e0b; /* kuning/orange */
+}
+
+.btn-icon.delete {
+  color: #ef4444; /* merah */
+}
+
+/* hover biar lebih hidup */
+.btn-icon:hover {
+  transform: scale(0.8);
+}
+
+.qty {
+  margin: 0 8px;
+  font-weight: bold;
+}
+
+/* SELECT VARIAN */
+[id^="var"] {
+  background: #020617;
+  color: #22c55e;
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 13px;
+  outline: none;
+}
+
+[id^="var"]:focus {
+  box-shadow: 0 0 8px rgba(34,197,94,0.6);
+}
+
+/* hover / focus biar hidup */
+select:focus {
+  box-shadow: 0 0 8px rgba(34,197,94,0.6);
+}
+
+/* option (tergantung browser, tapi tetap bantu) */
+option {
+  background: #020617;
+  color: white;
 }
 
 </style>
@@ -479,9 +536,9 @@ function render(){
           ${m.status=='habis' ? '<span style="color:red;font-size:12px;">❌ Stok Habis</span><br>' : ''}
 
           <br>
-          <button onclick="kurang(${m.id})" ${m.status=='habis'?'disabled':''}>➖</button>
-          <span id="q${m.id}">0</span>
-          <button onclick="tambah(${m.id})" ${m.status=='habis'?'disabled':''}>➕</button>
+          <button class="btn-icon minus" onclick="kurang(${m.id})" ${m.status=='habis'?'disabled':''}>➖</button>
+          <span id="q${m.id}" class="qty">0</span>
+          <button class="btn-icon plus" onclick="tambah(${m.id})" ${m.status=='habis'?'disabled':''}>➕</button>
         </div>
         <div style="width:110px;height:110px;">
           ${m.gambar?`<img src="${m.gambar}">`:''}
@@ -611,16 +668,14 @@ function update(){
         <td>${no++}</td>
         <td>${m.nama} ${varian?`(${varian})`:''}</td>
         <td style="text-align:center;">
-  		  <button onclick="kurangCart('${key}')">➖</button>
-	      ${cart[key]}
-  	      <button onclick="tambahCart('${key}')">➕</button>
+  		  <button class="btn-icon minus" onclick="kurangCart('${key}')">➖</button>
+	      <span class="qty">${cart[key]}</span>
+  	      <button class="btn-icon plus" onclick="tambahCart('${key}')">➕</button>
 		</td>
         <td style="text-align:right;">
   		  Rp ${formatRupiah(subtotal)}
   		  <br>
- 		  <button onclick="hapusItem('${key}')" style="font-size:10px;margin-top:5px;">
-   		    ❌ hapus
-		  </button>
+ 		  <button class="btn-icon delete" onclick="hapusItem('${key}')">❌</button>
 		</td>
       </tr>
       `;
@@ -642,6 +697,7 @@ function update(){
     count += cart[key];
   }
   document.getElementById("cartCount").innerText = count;
+  syncQtyMenu();
 }
 
 function prosesPesan(){
@@ -780,6 +836,25 @@ function kurangCart(key){
 function hapusItem(key){
   delete cart[key];
   update();
+}
+
+function syncQtyMenu(){
+  // reset semua dulu ke 0
+  menu.forEach(m=>{
+    let el = document.getElementById("q"+m.id);
+    if(el) el.innerText = 0;
+  });
+
+  // hitung ulang dari cart
+  for(let key in cart){
+    let [id] = key.split("-");
+    id = Number(id);
+
+    let el = document.getElementById("q"+id);
+    if(el){
+      el.innerText = Number(el.innerText) + cart[key];
+    }
+  }
 }
 
 </script>
