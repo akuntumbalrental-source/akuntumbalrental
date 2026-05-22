@@ -501,6 +501,10 @@ option {
 </div>
 
 <script>
+const urlParams = new URLSearchParams(window.location.search);
+const room = urlParams.get("room");
+const tipe = urlParams.get("tipe");
+
 let menu=[];
 let cart={};
 
@@ -728,7 +732,10 @@ function kirimWA(){
 
   let pesan="🚀 ORDER GALACTIC%0A";
   pesan+="📸 Kirim bukti transfer ya kak 🙏%0A%0A";
-  pesan+="👤Nama: "+nama+"%0A%0A";
+  if(room && tipe){
+  pesan+=`📍Room: No ${room} ${tipe}%0A`;
+}
+pesan+="👤Nama: "+nama+"%0A%0A";
 
   let total=0;
 
